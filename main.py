@@ -10,6 +10,8 @@ import config
 pygame.init()
 screen = pygame.display.set_mode((config.SCREEN_SIZE, config.SCREEN_SIZE))
 
+font = pygame.font.SysFont(config.SCORE_FONT, config.SCORE_SIZE)
+
 clock = pygame.time.Clock() 
 
 #*Funciones
@@ -33,6 +35,7 @@ current_score = 0
 running = True
 begin = True
 bait = True
+message = False
 
 time = None
 snake_rect = None
@@ -78,6 +81,14 @@ while running:
             (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)):
             running = False
         
+        #*Mostrar la puntuacion en la pantalla
+        if event.type  == pygame.KEYDOWN:
+            if event.key == pygame.K_s:
+                message = f"Score: {best_score}"
+        if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_c:
+                    message = None
+        
         #*Mover la serpiente con las flechas
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and not snake_direction.y:
@@ -111,7 +122,7 @@ while running:
     pygame.draw.rect(screen, config.FOOD_COLOR, food_rect, 0, 10)
     
     #*Dibujar la serpiente
-    [pygame.draw.rect(screen, config.SNAKE_COLOR, snake_part, 4, 1) 
+    [pygame.draw.rect(screen, config.SNAKE_COLOR, snake_part, config.SNAKE_PADDING, 1) 
      for snake_part in snake_parts]
     
     #*Colisiones
@@ -129,12 +140,17 @@ while running:
         save_best_score(best_score)
     
     #*Mostrar mejor puntaje
-    pygame.display.set_caption(f'Snake | Score: {snake_length - 1} | Best Score: {best_score}')
+    pygame.display.set_caption(f'Snake | Score: {snake_length - 1}')
     
     #*Comer la comida
     if snake_rect.colliderect(food_rect):
         bait = True
         snake_length += 1 
+    
+    #*Mostrar mensaje en la pantalla
+    if message:
+        text_score = font.render(f"Score: {snake_length - 1}    Best Score: {best_score}", True, config.SCORE_COLOR)
+        screen.blit(text_score, (10, 23))
     
     #*Actualizar la pantalla
     pygame.display.flip()
